@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
-import type { PositionSizingResult } from '@/lib/riskReward';
-import { formatCurrency, formatPrice, formatQuantity, formatRatio } from '@/lib/riskReward';
+import type { PositionSizingResult } from '../../lib/riskReward';
+import { formatCurrency, formatPrice, formatQuantity, formatRatio } from '../../lib/riskReward';
 
 type CalculatorResultProps = {
   darkMode: boolean;

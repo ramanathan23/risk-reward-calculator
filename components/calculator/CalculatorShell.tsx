@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { clsx } from 'clsx';
-import DecorativeBackground from '@/components/DecorativeBackground';
-import ThemeToggle from '@/components/ThemeToggle';
+import DecorativeBackground from '../DecorativeBackground';
+import ThemeToggle from '../ThemeToggle';
 import CalculatorForm from './CalculatorForm';
 import CalculatorResult from './CalculatorResult';
+import CalculatorDisclaimer from './CalculatorDisclaimer';
 import type { CalculatorFormValues, CalculatorFieldKey } from './types';
-import { calculatePositionSizing, parseRewardRatio } from '@/lib/riskReward';
+import { calculatePositionSizing, parseRewardRatio } from '../../lib/riskReward';
 
 const initialFormValues: CalculatorFormValues = {
   accountBalance: '100000',
@@ -176,6 +177,8 @@ export default function CalculatorShell() {
               <CalculatorResult darkMode={darkMode} error={error} result={result} />
             </div>
           </div>
+
+          <CalculatorDisclaimer darkMode={darkMode} />
         </section>
       </div>
     </div>

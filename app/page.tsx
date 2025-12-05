@@ -1,4 +1,4 @@
-import CalculatorShell from '@/components/calculator/CalculatorShell';
+import CalculatorShell from '../components/calculator/CalculatorShell';
 
 export default function HomePage() {
   return (
