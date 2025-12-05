@@ -1,6 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import DecorativeBackground from './DecorativeBackground';
 
+const calculateRiskReward = ({
+  accountBalance,
+  riskPercent,
+  entryPrice,
+  stopLossPrice,
+  rewardMultiple,
+}) => {
+  const riskAmount = accountBalance * (riskPercent / 100);
+  const rawRiskPerUnit = entryPrice - stopLossPrice;
+  const riskPerUnit = Math.abs(rawRiskPerUnit);
+
+  if (riskPerUnit === 0) {
+    return null;
+  }
+
+  const positionSize = riskAmount / riskPerUnit;
+
+  let takeProfitPrice = null;
+  let profitAmount = null;
+
+  if (Number.isFinite(rewardMultiple) && rewardMultiple > 0) {
+    const direction = rawRiskPerUnit >= 0 ? 1 : -1;
+    takeProfitPrice = entryPrice + direction * riskPerUnit * rewardMultiple;
+    profitAmount = positionSize * riskPerUnit * rewardMultiple;
+  }
+
+  return {
+    riskAmount,
+    riskPerUnit,
+    positionSize,
+    takeProfitPrice,
+    profitAmount,
+  };
+};
+
 export default function TradeQtyCalculator() {
   const [accountBalance, setAccountBalance] = useState('100000');
   const [riskPercent, setRiskPercent] = useState('2');
@@ -10,6 +45,7 @@ export default function TradeQtyCalculator() {
   const [quantity, setQuantity] = useState(null);
   const [error, setError] = useState('');
   const [darkMode, setDarkMode] = useState(true);
+  const parsedRiskPercent = parseFloat(riskPercent);
 
   // Initialize dark mode from system preference
   useEffect(() => {
@@ -22,8 +58,8 @@ export default function TradeQtyCalculator() {
   }, []);
 
   const accountBalanceOptions = [100000, 300000, 500000, 1000000];
-  const riskPercentOptions = [1, 2, 5];
-  const riskRewardOptions = ['1:2', '1:3', '2:5'];
+  const riskPercentOptions = [0.5, 1, 2, 3, 5];
+  const riskRewardOptions = ['1:2', '1:3', '1:5'];
 
   // Real-time calculation whenever inputs change
   useEffect(() => {
@@ -65,37 +101,45 @@ export default function TradeQtyCalculator() {
       return;
     }
 
-    // Parse R:R ratio - first number is risk multiplier, second is reward multiplier
-    let riskMultiplier = 1;
-    let rewardMultiplier = 1;
+    // Parse R:R ratio and convert to reward multiple relative to one unit of risk
+    let rewardMultiple = 1;
     if (riskRewardRatio) {
       const parts = riskRewardRatio.split(':');
-      riskMultiplier = parseFloat(parts[0]) || 1;
-      rewardMultiplier = parseFloat(parts[1]) || 1;
+      const parsedRiskPortion = parseFloat(parts[0]);
+      const parsedRewardPortion = parseFloat(parts[1]);
+
+      if (!isNaN(parsedRiskPortion) && !isNaN(parsedRewardPortion) && parsedRiskPortion > 0) {
+        rewardMultiple = parsedRewardPortion / parsedRiskPortion;
+      }
     }
 
-    // Calculate quantity with scaled risk
-    const actualRiskPercent = risk * riskMultiplier;
-    const riskAmount = balance * (actualRiskPercent / 100);
-    const tradeRisk = Math.abs(entry - stop);
-    const qty = riskAmount / tradeRisk;
+    const riskReward = calculateRiskReward({
+      accountBalance: balance,
+      riskPercent: risk,
+      entryPrice: entry,
+      stopLossPrice: stop,
+      rewardMultiple,
+    });
 
-    // Calculate take-profit based on R:R ratio
-    let takeProfit = null;
-    let profitAmount = null;
-    if (riskRewardRatio) {
-      profitAmount = balance * (risk / 100) * rewardMultiplier;
-      takeProfit = entry > stop 
-        ? entry + (profitAmount / qty) 
-        : entry - (profitAmount / qty);
+    if (!riskReward) {
+      setError('Entry price and stop loss price cannot be the same');
+      return;
     }
+
+    const {
+      riskAmount,
+      riskPerUnit,
+      positionSize,
+      takeProfitPrice,
+      profitAmount,
+    } = riskReward;
 
     setQuantity({
-      qty: qty.toFixed(2),
+      qty: positionSize.toFixed(2),
       riskAmount: riskAmount.toFixed(2),
-      actualRiskPercent: actualRiskPercent.toFixed(1),
-      tradeRisk: tradeRisk.toFixed(2),
-      takeProfit: takeProfit ? takeProfit.toFixed(2) : null,
+      actualRiskPercent: risk.toFixed(2),
+      tradeRisk: riskPerUnit.toFixed(2),
+      takeProfit: takeProfitPrice ? takeProfitPrice.toFixed(2) : null,
       profitAmount: profitAmount ? profitAmount.toFixed(2) : null,
       actualRR: riskRewardRatio || null,
     });
@@ -193,11 +237,11 @@ export default function TradeQtyCalculator() {
                 </div>
               </div>
 
-              {/* Risk Percent */}
+              {/* Risk Percentage */}
               <div className="group">
                 <label className={`flex items-center gap-1.5 text-xs font-semibold mb-1.5 transition-colors duration-300 ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>
                   <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-rose-400' : 'bg-rose-500'}`}></span>
-                  Risk % per Trade
+                  Risk % (higher = riskier trade)
                 </label>
                 <input
                   type="number"
@@ -213,7 +257,12 @@ export default function TradeQtyCalculator() {
                       : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-offset-white hover:border-gray-300'
                   } border`}
                 />
-                <div className="flex gap-1.5 mt-2">
+                {Number.isFinite(parsedRiskPercent) && (
+                  <p className={`mt-1 text-[10px] font-medium ${darkMode ? 'text-rose-300/80' : 'text-rose-500/80'}`}>
+                    Risking ~{parsedRiskPercent.toFixed(2)}% of account balance
+                  </p>
+                )}
+                <div className="flex gap-1.5 mt-2 flex-wrap">
                   {riskPercentOptions.map((option) => (
                     <button
                       key={option}
