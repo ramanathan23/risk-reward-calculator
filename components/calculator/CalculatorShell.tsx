@@ -10,6 +10,7 @@ import CalculatorDisclaimer from './CalculatorDisclaimer';
 import type { CalculatorFormValues, CalculatorFieldKey } from './types';
 import { calculatePositionSizing, parseRewardRatio } from '../../lib/riskReward';
 
+//test
 const initialFormValues: CalculatorFormValues = {
   accountBalance: '100000',
   riskPercent: '2',
