@@ -157,14 +157,24 @@ export default function CalculatorShell() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h1
-                className={clsx(
-                  'text-2xl font-extrabold tracking-tight sm:text-3xl',
-                  darkMode ? 'text-white' : 'text-gray-900',
-                )}
-              >
-                Risk Reward Calculator
-              </h1>
+              <div className="flex flex-wrap items-baseline gap-2">
+                <h1
+                  className={clsx(
+                    'text-2xl font-extrabold tracking-tight sm:text-3xl',
+                    darkMode ? 'text-white' : 'text-gray-900',
+                  )}
+                >
+                  Risk Reward Calculator
+                </h1>
+                <span
+                  className={clsx(
+                    'rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wide',
+                    darkMode ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-100 text-indigo-600',
+                  )}
+                >
+                  Beta
+                </span>
+              </div>
             </div>
             <p className={clsx('ml-10 text-xs sm:text-sm', darkMode ? 'text-slate-400' : 'text-gray-500')}>
               Calculate optimal position size with smart risk management
