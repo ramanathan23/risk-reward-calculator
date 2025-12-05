@@ -1,13 +1,45 @@
-# GitHub Codespaces ♥️ Next.js
+# Risk Reward Calculator
 
-Welcome to your shiny new Codespace running Next.js! We've got everything fired up and running for you to explore Next.js.
+Modernized Next.js app for calculating trade position sizing with type-safe utilities and Tailwind-driven UI.
 
-You've got a blank canvas to work on from a git perspective as well. There's a single initial commit with the what you're seeing right now - where you go from here is up to you!
+## Stack
 
-Everything you do here is contained within this one codespace. There is no repository on GitHub yet. If and when you’re ready you can click "Publish Branch" and we’ll create your repository and push up your project. If you were just exploring then and have no further need for this code then you can simply delete your codespace and it's gone forever.
+- Next.js App Router with TypeScript
+- React 18 + React DOM
+- Tailwind CSS for styling
+- Modular calculation helpers in `lib/riskReward.ts`
 
-To run this application:
+## Getting Started
 
-```
+Install dependencies and launch the local dev server:
+
+```bash
+npm install
 npm run dev
 ```
+
+Run a production build and preview it locally:
+
+```bash
+npm run build
+npm start
+```
+
+Lint the project:
+
+```bash
+npm run lint
+```
+
+## Project Layout
+
+- `app/` – App Router entrypoints and global styles
+- `components/` – Reusable UI building blocks split by domain
+- `lib/` – Pure calculation helpers with unit-friendly formatting utilities
+
+## Features
+
+- Live recalculation of quantity, risk, and profit metrics as inputs change
+- System-aware dark mode with manual override
+- Quick presets for balance, risk %, and R:R ratios
+- Decorative background rendered via SVG for a trading-inspired feel
